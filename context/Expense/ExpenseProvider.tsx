@@ -1,30 +1,15 @@
 import React, { useState } from "react";
-import { IExpense, IExpenseContextData } from "../../interfaces/iExpense";
+import { IExpense } from "../../interfaces/iExpense";
 import ExpenseContext from "./ExpenseContext";
+import { generateExpenses } from "../../devUtils";
 
-const initialExpenses: IExpense[] = [
-  {
-    expenseId: "1",
-    cost: 50,
-    name: "Groceries",
-    category: "Food",
-    date: new Date(),
-  },
-  {
-    expenseId: "2",
-    cost: 20,
-    name: "Movie ticket",
-    category: "Entertainment",
-    date: new Date(),
-  },
-];
-
+const mock100Items = generateExpenses();
 interface ExpenseProviderProps {
   children: React.ReactNode;
 }
 
 const ExpenseProvider: React.FC<ExpenseProviderProps> = ({ children }) => {
-  const [expenseList, setExpenseList] = useState<IExpense[]>([]);
+  const [expenseList, setExpenseList] = useState<IExpense[]>(mock100Items);
 
   const addExpense = (expense: IExpense) => {
     setExpenseList([...expenseList, expense]);

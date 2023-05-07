@@ -1,19 +1,28 @@
-import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import React, { useRef } from "react";
+import { ScrollView, View, Text, StyleSheet } from "react-native";
+
+type ViewRef = React.RefObject<View>;
 
 const FragmentOne: React.FC = () => {
+  const viewRef: ViewRef = useRef<View>(null);
+
   return (
-    <View style={styles.container}>
-      <Text>Fragment Two</Text>
+    <View ref={viewRef} style={styles.container}>
+      <Text style={styles.text}>Fragment One</Text>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    height: 80,
+    backgroundColor: "#007AFF",
+    elevation: 5,
     justifyContent: "center",
     alignItems: "center",
+  },
+  text: {
+    color: "#fff",
   },
 });
 
