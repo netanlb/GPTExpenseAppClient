@@ -9,13 +9,15 @@ const FragmentTwo: React.FC = () => {
   return (
     <View style={styles.container}>
       {expenseList.map((expense: IExpense) => (
-        <View key={expense.expenseId} style={styles.expenseItem}>
+        <View key={expense.id} style={styles.expenseItem}>
           <View>
             <Text style={styles.expenseName}>{expense.name}</Text>
             <Text style={styles.expenseDetails}>{expense.category}</Text>
           </View>
           <View>
-            <Text style={styles.expenseDetails}>{expense.cost.toFixed(2)}</Text>
+            <Text style={styles.expenseDetails}>
+              {expense.cost!.toFixed(2)}
+            </Text>
             <Text style={styles.expenseDetails}>
               {new Date(expense.date).toLocaleDateString()}
             </Text>

@@ -9,15 +9,17 @@ interface ExpenseProviderProps {
 }
 
 const ExpenseProvider: React.FC<ExpenseProviderProps> = ({ children }) => {
-  const [expenseList, setExpenseList] = useState<IExpense[]>(mock100Items);
+  const [expenseList, setExpenseList] = useState<IExpense[]>(
+    mock100Items.sort(
+      (a: IExpense, b: IExpense) => a.date.getTime() - b.date.getTime()
+    )
+  );
 
   const addExpense = (expense: IExpense) => {
-    setExpenseList([...expenseList, expense]);
+    setExpenseList([expense, ...expenseList]);
   };
-  const deleteExpense = (expenseId: string) => {
-    const newExpenseList = expenseList.filter(
-      (expense) => expense.expenseId !== expenseId
-    );
+  const deleteExpense = (id: string) => {
+    const newExpenseList = expenseList.filter((expense) => expense.id !== id);
     setExpenseList(newExpenseList);
   };
 

@@ -3,6 +3,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import LoginScreen from "../components/Login/LoginScreen";
 import RegisterScreen from "../components/Register/RegisterScreen";
+import { NavigationContainer } from "@react-navigation/native";
 
 interface RootStackParamList {
   [key: string]: undefined | object;
@@ -21,10 +22,12 @@ const Stack = createNativeStackNavigator();
 
 const AuthNavigator: React.FC = () => {
   return (
-    <Stack.Navigator initialRouteName="Login">
-      <Stack.Screen name="Login" component={LoginScreen} />
-      <Stack.Screen name="Register" component={RegisterScreen} />
-    </Stack.Navigator>
+    <NavigationContainer>
+      <Stack.Navigator initialRouteName="Login">
+        <Stack.Screen name="Login" component={LoginScreen} />
+        <Stack.Screen name="Register" component={RegisterScreen} />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 };
 

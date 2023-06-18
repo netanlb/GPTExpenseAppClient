@@ -1,5 +1,6 @@
 import React, { useRef } from "react";
-import { ScrollView, View, Text, StyleSheet } from "react-native";
+import { ScrollView, View, Text, StyleSheet, Button } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 
 type ViewRef = React.RefObject<View>;
 
@@ -8,21 +9,29 @@ const FragmentOne: React.FC = () => {
 
   return (
     <View ref={viewRef} style={styles.container}>
-      <Text style={styles.text}>Fragment One</Text>
+      <Text style={styles.text}>Good Evening</Text>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
+    display: "flex",
+    flexDirection: "row",
+    gap: 10,
     height: 80,
     backgroundColor: "#007AFF",
     elevation: 5,
-    justifyContent: "center",
     alignItems: "center",
   },
   text: {
     color: "#fff",
+    padding: 10,
+    fontSize: 20,
+    fontWeight: "600",
+  },
+  addButton: {
+    marginLeft: 10,
   },
 });
 

@@ -8,35 +8,52 @@ import {
   TouchableOpacity,
 } from "react-native";
 
+interface Validator {
+  check: boolean;
+  message: string;
+}
+
+interface Validators {
+  [key: string]: Validator;
+}
+
 const RegisterScreen = () => {
+  // States
   const [userName, setUserName] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [verifyPassword, setVerifyPassword] = useState<string>("");
+
   const [inputErrors, setInputErrors] = useState<string[]>([]);
+
+  // Methods
 
   const hasSpace = (str: string): boolean => {
     return str.trim().indexOf(" ") >= 0;
   };
 
-  const isValidUserName = !hasSpace(userName) && userName.trim().length > 5;
-
-  const isValidPassword = password.trim().length > 5 && !hasSpace(password);
-  const passwordsMatch = password === verifyPassword;
+  const validators: Validators = {
+    isValidUserName: {
+      check: !hasSpace(userName) && userName.trim().length > 5,
+      message:
+        "username must be at least 6 characters long and contain no spaces",
+    },
+    isValidPassword: {
+      check: password.trim().length > 5 && !hasSpace(password),
+      message:
+        "password must be at least 6 characters long and contain no spaces",
+    },
+    passwordsMatch: {
+      check: password === verifyPassword,
+      message: "password fields must match",
+    },
+  };
 
   const handleRegister = (): void => {
     const newInputErrors: string[] = [];
 
-    if (!isValidUserName)
-      newInputErrors.push(
-        "username must be at least 6 characters long and contain no spaces"
-      );
-
-    if (!isValidPassword)
-      newInputErrors.push(
-        "password must be at least 6 characters long and contain no spaces"
-      );
-
-    if (!passwordsMatch) newInputErrors.push("password fields must match");
+    Object.entries(validators).forEach(
+      ([key, value]) => !value.check && newInputErrors.push(value.message)
+    );
 
     setInputErrors(newInputErrors);
 
@@ -50,21 +67,24 @@ const RegisterScreen = () => {
     <>
       <View style={styles.container}>
         <Text style={styles.title}>Register</Text>
+        <Text>Username</Text>
         <TextInput
           style={styles.input}
-          placeholder="Username"
+          placeholder="Enter username"
           onChangeText={setUserName}
           value={userName}
         ></TextInput>
+        <Text>Password</Text>
         <TextInput
           style={styles.input}
-          placeholder="password"
+          placeholder="Enter password"
           onChangeText={setPassword}
           value={password}
         ></TextInput>
+        <Text>Verify Password</Text>
         <TextInput
           style={styles.input}
-          placeholder="verify password"
+          placeholder="Enter password again"
           onChangeText={setVerifyPassword}
           value={verifyPassword}
         ></TextInput>
@@ -94,8 +114,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
   errorMessage: {
-    fontSize: 1,
+    fontSize: 14,
     color: "red",
+  },
+  label: {
+    position: "relative",
+    top: 20,
+    opacity: 0,
+  },
+  labelFocused: {
+    top: 0,
+    opacity: 1,
   },
 });
 

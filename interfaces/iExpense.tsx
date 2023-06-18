@@ -1,6 +1,6 @@
 export interface IExpense {
-  expenseId: string | null;
-  cost: number;
+  id: string | null;
+  cost: number | null;
   name: string;
   category: string;
   date: Date;

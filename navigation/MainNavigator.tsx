@@ -1,7 +1,9 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import HomeScreen from "../components/Home/HomeScreen";
-import ProfileScreen from "../components/Profile/ProfileScreen";
 import { Ionicons } from "@expo/vector-icons";
+import { NavigationContainer } from "@react-navigation/native";
+import ProfileNavigator from "../components/Profile/ProfileNavigator";
+import HomeNavigator from "../components/Home/HomeNavigator";
+import { Button } from "react-native";
 
 const Tab = createBottomTabNavigator();
 
@@ -10,8 +12,9 @@ const Tabs = () => {
     <Tab.Navigator>
       <Tab.Screen
         name="Home"
-        component={HomeScreen}
+        component={HomeNavigator}
         options={{
+          headerShown: false,
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="home-outline" size={size} color={color} />
           ),
@@ -19,8 +22,9 @@ const Tabs = () => {
       ></Tab.Screen>
       <Tab.Screen
         name="Profile"
-        component={ProfileScreen}
+        component={ProfileNavigator}
         options={{
+          headerShown: false,
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="person-outline" size={size} color={color} />
           ),
@@ -30,4 +34,12 @@ const Tabs = () => {
   );
 };
 
-export default Tabs;
+const Main = () => {
+  return (
+    <NavigationContainer>
+      <Tabs></Tabs>
+    </NavigationContainer>
+  );
+};
+
+export default Main;

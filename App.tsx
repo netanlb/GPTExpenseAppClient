@@ -1,5 +1,4 @@
 import React, { useContext } from "react";
-import { NavigationContainer } from "@react-navigation/native";
 import AuthNavigator from "./navigation/AuthNavigator";
 import MainNavigator from "./navigation/MainNavigator";
 import { UserContext, UserProvider } from "./context";
@@ -12,10 +11,8 @@ const AppContent: React.FC = () => {
 
 export default function App() {
   return (
-    <NavigationContainer>
-      <UserProvider>
-        <AppContent />
-      </UserProvider>
-    </NavigationContainer>
+    <UserProvider>
+      <AppContent />
+    </UserProvider>
   );
 }
