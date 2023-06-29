@@ -1,12 +1,6 @@
-import { useState } from "react";
-import {
-  View,
-  Text,
-  Button,
-  TextInput,
-  StyleSheet,
-  TouchableOpacity,
-} from "react-native";
+import { useState, useContext } from "react";
+import { View, Text, Button, TextInput, StyleSheet } from "react-native";
+import { UserContext } from "../../context";
 
 interface Validator {
   check: boolean;
@@ -17,25 +11,49 @@ interface Validators {
   [key: string]: Validator;
 }
 
+const emailRegex = new RegExp(
+  /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/
+);
+
 const RegisterScreen = () => {
+  const { loginUser, registerUser } = useContext(UserContext);
   // States
   const [userName, setUserName] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
   const [verifyPassword, setVerifyPassword] = useState<string>("");
-
   const [inputErrors, setInputErrors] = useState<string[]>([]);
 
   // Methods
+
+  const handleRegister = (): void => {
+    if (!validateForm()) return;
+
+    registerUserApi();
+  };
+
+  const registerUserApi = async (): Promise<void> => {
+    try {
+      await registerUser(userName, email, password);
+    } catch (err: any) {
+      setInputErrors([err.message]);
+    }
+  };
 
   const hasSpace = (str: string): boolean => {
     return str.trim().indexOf(" ") >= 0;
   };
 
+  // validation and input error messages
   const validators: Validators = {
     isValidUserName: {
       check: !hasSpace(userName) && userName.trim().length > 5,
       message:
         "username must be at least 6 characters long and contain no spaces",
+    },
+    isValidEmail: {
+      check: emailRegex.test(email),
+      message: "email is invalid",
     },
     isValidPassword: {
       check: password.trim().length > 5 && !hasSpace(password),
@@ -48,7 +66,7 @@ const RegisterScreen = () => {
     },
   };
 
-  const handleRegister = (): void => {
+  const validateForm = (): boolean => {
     const newInputErrors: string[] = [];
 
     Object.entries(validators).forEach(
@@ -56,11 +74,7 @@ const RegisterScreen = () => {
     );
 
     setInputErrors(newInputErrors);
-
-    if (newInputErrors.length) return;
-
-    // make an api call to save the registered details
-    // login and navigate to the main screen
+    return !newInputErrors.length;
   };
 
   return (
@@ -74,12 +88,20 @@ const RegisterScreen = () => {
           onChangeText={setUserName}
           value={userName}
         ></TextInput>
+        <Text>Email</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter email"
+          onChangeText={setEmail}
+          value={email}
+        ></TextInput>
         <Text>Password</Text>
         <TextInput
           style={styles.input}
           placeholder="Enter password"
           onChangeText={setPassword}
           value={password}
+          secureTextEntry={true}
         ></TextInput>
         <Text>Verify Password</Text>
         <TextInput
@@ -87,6 +109,7 @@ const RegisterScreen = () => {
           placeholder="Enter password again"
           onChangeText={setVerifyPassword}
           value={verifyPassword}
+          secureTextEntry={true}
         ></TextInput>
         <Button title="Register" onPress={() => handleRegister()} />
         <View style={{ marginBottom: 20 }}></View>
@@ -116,15 +139,6 @@ const styles = StyleSheet.create({
   errorMessage: {
     fontSize: 14,
     color: "red",
-  },
-  label: {
-    position: "relative",
-    top: 20,
-    opacity: 0,
-  },
-  labelFocused: {
-    top: 0,
-    opacity: 1,
   },
 });
 

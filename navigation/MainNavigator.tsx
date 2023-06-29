@@ -3,34 +3,48 @@ import { Ionicons } from "@expo/vector-icons";
 import { NavigationContainer } from "@react-navigation/native";
 import ProfileNavigator from "../components/Profile/ProfileNavigator";
 import HomeNavigator from "../components/Home/HomeNavigator";
-import { Button } from "react-native";
+import AssistantNavigation from "../components/Assistant/AssistantNavigator";
+import { ExpenseProvider } from "../context";
 
 const Tab = createBottomTabNavigator();
 
 const Tabs = () => {
   return (
-    <Tab.Navigator>
-      <Tab.Screen
-        name="Home"
-        component={HomeNavigator}
-        options={{
-          headerShown: false,
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="home-outline" size={size} color={color} />
-          ),
-        }}
-      ></Tab.Screen>
-      <Tab.Screen
-        name="Profile"
-        component={ProfileNavigator}
-        options={{
-          headerShown: false,
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="person-outline" size={size} color={color} />
-          ),
-        }}
-      ></Tab.Screen>
-    </Tab.Navigator>
+    <ExpenseProvider>
+      <Tab.Navigator>
+        <Tab.Screen
+          name="Home"
+          component={HomeNavigator}
+          options={{
+            headerShown: false,
+            tabBarIcon: ({ color, size }) => (
+              <Ionicons name="home-outline" size={size} color={color} />
+            ),
+          }}
+        ></Tab.Screen>
+
+        <Tab.Screen
+          name="Assistant"
+          component={AssistantNavigation}
+          options={{
+            headerShown: false,
+            tabBarIcon: ({ color, size }) => (
+              <Ionicons name="chatbox-outline" size={size} color={color} />
+            ),
+          }}
+        ></Tab.Screen>
+        <Tab.Screen
+          name="Profile"
+          component={ProfileNavigator}
+          options={{
+            headerShown: false,
+            tabBarIcon: ({ color, size }) => (
+              <Ionicons name="person-outline" size={size} color={color} />
+            ),
+          }}
+        ></Tab.Screen>
+      </Tab.Navigator>
+    </ExpenseProvider>
   );
 };
 

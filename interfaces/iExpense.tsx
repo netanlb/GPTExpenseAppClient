@@ -1,7 +1,7 @@
 export interface IExpense {
-  id: string | null;
-  cost: number | null;
-  name: string;
+  _id?: string;
+  sum: number | null;
+  description: string;
   category: string;
   date: Date;
 }

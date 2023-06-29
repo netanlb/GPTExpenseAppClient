@@ -1,23 +1,46 @@
 import { View, Text, TextInput, StyleSheet, Button } from "react-native";
 import { Picker } from "@react-native-picker/picker";
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { ExpenseContext } from "../../../context";
 import { IExpense } from "../../../interfaces/iExpense";
 import { RootStackParamList } from "../HomeNavigator";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { generateExpenses } from "./utils";
+
+const itemList = generateExpenses(20);
 
 interface AddExpenseProps {
   navigation: NativeStackNavigationProp<RootStackParamList, "AddExpenseScreen">;
 }
 
 const AddExpenseScreen: React.FC<AddExpenseProps> = ({ navigation }) => {
+  // useEffect(() => {
+  //   console.log("adding expenses...");
+  //   const itemList = generateExpenses(20);
+
+  //   async function addItems() {
+  //     for (const item of itemList) {
+  //       console.log(item);
+  //       try {
+  //         await addExpense(item);
+  //         console.log("made api call");
+  //         // Delay of 500ms between each API call
+  //         await new Promise((resolve) => setTimeout(resolve, 500));
+  //       } catch (error) {
+  //         console.error(error);
+  //       }
+  //     }
+  //   }
+
+  //   addItems();
+  // }, []);
+
   const { addExpense } = useContext(ExpenseContext);
 
   const [expense, setExpense] = useState<IExpense>({
-    id: null,
-    name: "",
-    cost: null,
+    description: "",
+    sum: null,
     category: "",
     date: new Date(),
   });
@@ -34,44 +57,51 @@ const AddExpenseScreen: React.FC<AddExpenseProps> = ({ navigation }) => {
 
   const onSubmitExpense = (): void => {
     if (!areAllFieldsFilled()) return;
-    setExpense({ ...expense, id: expense.name + new Date().getTime() });
+    setExpense({
+      ...expense,
+    });
     addExpense(expense);
-    navigation.navigate("HomeScreen");
+    navigation.navigate("HomeScreen", {});
   };
 
   const areAllFieldsFilled = (): boolean => {
-    return !!(expense.cost && expense.category && expense.date);
+    return !!(expense.sum && expense.category && expense.date);
   };
 
   const items = [
     { label: "None", value: "" },
-    { label: "Food", value: "food" },
-    { label: "Transportation", value: "transportation" },
-    { label: "Entertainment", value: "entertainment" },
-    { label: "Bills", value: "bills" },
-    { label: "Other", value: "other" },
+    { label: "Housing", value: "Housing" },
+    { label: "Utilities", value: "Utilities" },
+    { label: "Food", value: "Food" },
+    { label: "Transportation", value: "Transportation" },
+    { label: "Healthcare", value: "Healthcare" },
+    { label: "Education", value: "Education" },
+    { label: "Entertainment", value: "Entertainment" },
+    { label: "Personal Care", value: "Personal Care" },
+    { label: "Clothing", value: "Clothing" },
+    { label: "Other", value: "Other" },
   ];
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>New Expense</Text>
-      <Text>Name</Text>
+      <Text>Description</Text>
       <TextInput
         style={styles.input}
-        placeholder="Enter a name that describes the expense"
-        value={expense.name}
-        onChangeText={(value) => setExpense({ ...expense, name: value })}
+        placeholder="Describe the expense"
+        value={expense.description}
+        onChangeText={(value) => setExpense({ ...expense, description: value })}
       ></TextInput>
       <Text>Cost</Text>
       <TextInput
         style={styles.input}
         keyboardType="numeric"
         placeholder="How much did you spend"
-        value={expense.cost ? "" + expense.cost : ""}
+        value={expense.sum ? "" + expense.sum : ""}
         onChangeText={(value) =>
           value
-            ? setExpense({ ...expense, cost: +value })
-            : setExpense({ ...expense, cost: null })
+            ? setExpense({ ...expense, sum: +value })
+            : setExpense({ ...expense, sum: null })
         }
       ></TextInput>
       <Text>Category</Text>
