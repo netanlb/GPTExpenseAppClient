@@ -1,9 +1,17 @@
 import React, { useState } from "react";
 import UserContext from "./UserContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { DEV_SERVER_URL, PROD_SERVER_URL } from "@env";
 
 interface UserProviderProps {
   children: React.ReactNode;
+}
+
+let serverURL: string;
+if (__DEV__) {
+  serverURL = DEV_SERVER_URL;
+} else {
+  serverURL = PROD_SERVER_URL;
 }
 
 const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
@@ -12,7 +20,7 @@ const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   const [user, setUser] = useState<any>(null);
 
   const loginUser = async (email: string, password: string): Promise<void> => {
-    const url: string = `http://10.100.102.98:5000/auth/`;
+    const url: string = `${serverURL}/auth/`;
     const body: { [key: string]: any } = {
       email,
       password,
@@ -44,7 +52,7 @@ const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     email: string,
     password: string
   ): Promise<void> => {
-    const url: string = `http://10.100.102.98:5000/users/`;
+    const url: string = `${serverURL}/users`;
     const body: { [key: string]: any } = {
       name,
       email,
@@ -84,7 +92,7 @@ const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     try {
       await AsyncStorage.setItem("@user", JSON.stringify(user));
     } catch (error: any) {
-      console.log(error);
+      console.log(error.message);
     }
   };
 

@@ -2,22 +2,34 @@ import React, { useState, useEffect, useContext } from "react";
 import { IExpense } from "../../interfaces/iExpense";
 import ExpenseContext from "./ExpenseContext";
 import UserContext from "../User/UserContext";
+import { DEV_SERVER_URL, PROD_SERVER_URL } from "@env";
 
 interface ExpenseProviderProps {
   children: React.ReactNode;
 }
 
+let serverURL: string;
+if (__DEV__) {
+  serverURL = DEV_SERVER_URL; // In development, use the local IP and port
+} else {
+  serverURL = PROD_SERVER_URL; // In production, use the production URL
+}
+
 const ExpenseProvider: React.FC<ExpenseProviderProps> = ({ children }) => {
   const [expenseList, setExpenseList] = useState<IExpense[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
   const { userId } = useContext(UserContext); // Access the userId from UserContext
 
   useEffect(() => {
-    fetchExpenses();
+    const [month, year] = getCurrentMonthAndYear();
+    resetExpenses({ month: ["" + month], year: ["" + year] });
   }, [userId]); // Add userId as a dependency so that expenses are refetched whenever the user changes
 
-  const fetchExpenses = async (queryParams?: { [key: string]: string[] }) => {
+  const fetchExpenses = async (queryParams?: {
+    [key: string]: string[];
+  }): Promise<IExpense[]> => {
     try {
-      let url = new URL(`http://10.100.102.98:5000/cost`);
+      let url = new URL(`${serverURL}/cost/`);
       url.searchParams.append("user_id", userId!);
 
       if (queryParams) {
@@ -28,8 +40,6 @@ const ExpenseProvider: React.FC<ExpenseProviderProps> = ({ children }) => {
             );
           }
         );
-
-        console.log(url);
       }
 
       const res = await fetch(url, {
@@ -44,18 +54,25 @@ const ExpenseProvider: React.FC<ExpenseProviderProps> = ({ children }) => {
       }
 
       const expenses: IExpense[] = await res.json();
-      setExpenseList(expenses);
+      return expenses;
     } catch (err) {
       console.error(err);
-      setExpenseList([]);
+      return [];
     }
   };
 
+  const resetExpenses = async (queryParams?: { [key: string]: string[] }) => {
+    setIsLoading(true);
+    const expenses = await fetchExpenses(queryParams);
+    setExpenseList(expenses);
+    setIsLoading(false);
+  };
+
   const addExpense = async (expense: IExpense) => {
+    setIsLoading(true);
     try {
-      const url = `http://10.100.102.98:5000/cost/`; // Adjust URL as needed
+      const url = `${serverURL}/cost/`; // Adjust URL as needed
       const body = { ...expense, user_id: userId };
-      console.log(body);
       const res = await fetch(url, {
         method: "POST",
         headers: {
@@ -73,16 +90,51 @@ const ExpenseProvider: React.FC<ExpenseProviderProps> = ({ children }) => {
     } catch (err) {
       console.error(err);
     }
+    setIsLoading(false);
   };
 
-  const deleteExpense = (id: string) => {
-    const newExpenseList = expenseList.filter((expense) => expense._id !== id);
-    setExpenseList(newExpenseList);
+  const deleteExpense = async (id: string) => {
+    setIsLoading(true);
+    try {
+      const url = new URL(`${serverURL}/cost/${id}`);
+
+      const res = await fetch(url, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+
+      // delete on the client
+      const newExpenseList = expenseList.filter(
+        (expense) => expense._id !== id
+      );
+      setExpenseList(newExpenseList);
+    } catch (error: any) {
+      console.log(error.message);
+    }
+    setIsLoading(false);
+  };
+
+  const getCurrentMonthAndYear = () => {
+    const date = new Date();
+    return [date.getMonth(), date.getFullYear()];
   };
 
   return (
     <ExpenseContext.Provider
-      value={{ expenseList, addExpense, deleteExpense, fetchExpenses }}
+      value={{
+        expenseList,
+        addExpense,
+        deleteExpense,
+        fetchExpenses,
+        resetExpenses,
+        isLoading,
+      }}
     >
       {children}
     </ExpenseContext.Provider>

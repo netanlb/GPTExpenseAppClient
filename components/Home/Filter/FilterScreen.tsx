@@ -17,7 +17,7 @@ interface FilterProps {
 }
 
 const FilterScreen: React.FC<FilterProps> = ({ navigation }) => {
-  const { fetchExpenses } = useContext(ExpenseContext);
+  const { resetExpenses } = useContext(ExpenseContext);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedMonths, setSelectedMonths] = useState<string[]>([]);
   const [selectedYears, setSelectedYears] = useState<string[]>([]);
@@ -42,7 +42,7 @@ const FilterScreen: React.FC<FilterProps> = ({ navigation }) => {
   const handleFilter = () => {
     if (!validate()) return;
     const queryParamsLists: { [key: string]: string[] } = {
-      category: selectedCategories.map((item) => item.toLowerCase()),
+      category: selectedCategories.map((item) => item),
       month: selectedMonths.map((item: string) => "" + monthsMap[item]),
       year: selectedYears,
     };
@@ -52,7 +52,7 @@ const FilterScreen: React.FC<FilterProps> = ({ navigation }) => {
       !queryParamsLists[key].length && delete queryParamsLists[key];
     });
 
-    fetchExpenses(queryParamsLists);
+    resetExpenses(queryParamsLists);
     navigation.navigate("HomeScreen", {});
   };
 

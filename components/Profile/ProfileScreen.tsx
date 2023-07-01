@@ -23,7 +23,6 @@ const ProfileScreen = () => {
         <Card.Title>User Details</Card.Title>
         <Card.Divider />
         <Text>Email: {user?.email}</Text>
-        <Text>User ID: {user?.id}</Text>
       </Card>
       <View style={styles.spacer}></View>
       <Button title="Sign Out" onPress={handleSignOut}></Button>
