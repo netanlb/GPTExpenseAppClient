@@ -11,7 +11,7 @@ const FragmentOne: React.FC = () => {
   const [tip, setTip] = useState<string>(`Hello ${user?.name}`);
 
   useEffect(() => {
-    // generateChatGptTip();
+    generateChatGptTip();
   }, []);
   const getCurrentMonthAndYear = () => {
     const date = new Date();
@@ -34,7 +34,7 @@ const FragmentOne: React.FC = () => {
       .join(" ")}`;
 
     const userMessage =
-      "generate a fact about my expenses, no longer than 12 words, refer to the user as 'you'";
+      "generate a fact about my expenses this month, it could be a crictism, humorous comment, informative observation, warning of bad or encouragement of good behavior, no longer than 12 words, refer to the user as 'you'.";
 
     const url = "https://api.openai.com/v1/chat/completions";
     const body = {
@@ -43,7 +43,7 @@ const FragmentOne: React.FC = () => {
         { role: "system", content: systemMessage },
         { role: "user", content: userMessage },
       ],
-      max_tokens: 20,
+      max_tokens: 35,
     };
 
     try {

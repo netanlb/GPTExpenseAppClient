@@ -14,6 +14,6 @@ export default HomeScreen;
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: 50, // Adjust the value accordingly
+    marginBottom: 160, // Adjust the value accordingly
   },
 });
