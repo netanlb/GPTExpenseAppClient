@@ -11,7 +11,7 @@ const FragmentOne: React.FC = () => {
   const [tip, setTip] = useState<string>(`Hello ${user?.name}`);
 
   useEffect(() => {
-    generateChatGptTip();
+    // generateChatGptTip();
   }, []);
   const getCurrentMonthAndYear = () => {
     const date = new Date();

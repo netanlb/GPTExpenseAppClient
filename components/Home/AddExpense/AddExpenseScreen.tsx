@@ -8,7 +8,7 @@ import { RootStackParamList } from "../HomeNavigator";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { generateExpenses } from "./utils";
 
-const itemList = generateExpenses(20);
+// const itemList = generateExpenses(20);
 
 interface AddExpenseProps {
   navigation: NativeStackNavigationProp<RootStackParamList, "AddExpenseScreen">;

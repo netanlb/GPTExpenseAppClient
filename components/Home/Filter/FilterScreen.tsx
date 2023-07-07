@@ -92,7 +92,7 @@ const FilterScreen: React.FC<FilterProps> = ({ navigation }) => {
     "November",
     "December",
   ];
-  const years = ["2022", "2023", "2024", "2025"];
+  const years = ["2022", "2023"];
 
   const toggleSelection = (
     item: string,

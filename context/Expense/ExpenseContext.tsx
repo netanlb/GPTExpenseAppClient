@@ -9,6 +9,7 @@ export interface IExpenseContextData {
     [key: string]: string[];
   }) => Promise<IExpense[]>;
   resetExpenses: (queryParams?: { [key: string]: string[] }) => void;
+  fetchGroupedExpenses: (year?: number, month?: number) => Promise<any[]>;
   isLoading: boolean;
 }
 
@@ -17,6 +18,7 @@ const ExpenseContext = React.createContext<IExpenseContextData>({
   addExpense: () => {},
   deleteExpense: () => {},
   fetchExpenses: () => Promise.resolve([]),
+  fetchGroupedExpenses: () => Promise.resolve([]),
   resetExpenses: () => {},
   isLoading: false,
 });

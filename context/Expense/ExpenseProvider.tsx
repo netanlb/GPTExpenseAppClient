@@ -25,11 +25,40 @@ const ExpenseProvider: React.FC<ExpenseProviderProps> = ({ children }) => {
     resetExpenses({ month: ["" + month], year: ["" + year] });
   }, [userId]); // Add userId as a dependency so that expenses are refetched whenever the user changes
 
+  const fetchGroupedExpenses = async (
+    year?: number,
+    month?: number
+  ): Promise<any[]> => {
+    try {
+      let url = new URL(`${serverURL}/cost/groupBy`);
+      url.searchParams.append("user_id", userId!);
+      if (year) url.searchParams.append("year", year.toString());
+      if (month) url.searchParams.append("month", month.toString());
+
+      const res = await fetch(url, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+
+      const groupedExpenses = await res.json();
+      return groupedExpenses;
+    } catch (error) {
+      console.log(error);
+      return [];
+    }
+  };
+
   const fetchExpenses = async (queryParams?: {
     [key: string]: string[];
   }): Promise<IExpense[]> => {
     try {
-      let url = new URL(`${serverURL}/cost/`);
+      let url = new URL(`${serverURL}/cost`);
       url.searchParams.append("user_id", userId!);
 
       if (queryParams) {
@@ -71,7 +100,7 @@ const ExpenseProvider: React.FC<ExpenseProviderProps> = ({ children }) => {
   const addExpense = async (expense: IExpense) => {
     setIsLoading(true);
     try {
-      const url = `${serverURL}/cost/`; // Adjust URL as needed
+      const url = `${serverURL}/cost`; // Adjust URL as needed
       const body = { ...expense, user_id: userId };
       const res = await fetch(url, {
         method: "POST",
@@ -132,6 +161,7 @@ const ExpenseProvider: React.FC<ExpenseProviderProps> = ({ children }) => {
         addExpense,
         deleteExpense,
         fetchExpenses,
+        fetchGroupedExpenses,
         resetExpenses,
         isLoading,
       }}

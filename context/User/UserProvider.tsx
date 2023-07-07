@@ -20,7 +20,7 @@ const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   const [user, setUser] = useState<any>(null);
 
   const loginUser = async (email: string, password: string): Promise<void> => {
-    const url: string = `${serverURL}/auth/`;
+    const url: string = `${serverURL}/auth`;
     const body: { [key: string]: any } = {
       email,
       password,

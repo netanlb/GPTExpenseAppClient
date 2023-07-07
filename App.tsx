@@ -24,7 +24,8 @@ const AppContent: React.FC = () => {
     try {
       const jsonUser = await AsyncStorage.getItem("@user");
       const storageUser = jsonUser !== null ? JSON.parse(jsonUser) : null;
-      if (jsonUser && !storageUser) throw new Error("error retrieving user");
+      if (jsonUser && storageUser === null)
+        throw new Error("error retrieving user, login again");
 
       console.log(serverURL);
       const url = new URL(`${serverURL}/auth/user`);
