@@ -6,6 +6,7 @@ import {
   TextInput,
   StyleSheet,
   TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
 import { LoginScreenProps } from "../../navigation/AuthNavigator";
 import { UserContext } from "../../context";
@@ -24,6 +25,7 @@ interface Validators {
 }
 
 const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
+  const [isLoading, setIsLoading] = useState(false);
   const { loginUser } = useContext(UserContext);
 
   const [email, setEmail] = useState("");
@@ -32,12 +34,13 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
 
   const handleLogin = async (): Promise<void> => {
     if (!validateForm()) return;
-
+    setIsLoading(true);
     try {
       await loginUser(email, password);
     } catch (error: any) {
       setInputErrors([error.message]);
     }
+    setIsLoading(false);
   };
 
   // validation and setting of error messages
@@ -71,6 +74,14 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
   const handleRegister = (): void => {
     navigation.navigate("Register");
   };
+
+  if (isLoading) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center" }}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
 
   return (
     <>

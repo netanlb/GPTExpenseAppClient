@@ -1,5 +1,12 @@
 import { useState, useContext } from "react";
-import { View, Text, Button, TextInput, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  Button,
+  TextInput,
+  StyleSheet,
+  ActivityIndicator,
+} from "react-native";
 import { UserContext } from "../../context";
 
 interface Validator {
@@ -16,6 +23,7 @@ const emailRegex = new RegExp(
 );
 
 const RegisterScreen = () => {
+  const [isLoading, setIsLoading] = useState(false);
   const { loginUser, registerUser } = useContext(UserContext);
   // States
   const [userName, setUserName] = useState<string>("");
@@ -33,11 +41,13 @@ const RegisterScreen = () => {
   };
 
   const registerUserApi = async (): Promise<void> => {
+    setIsLoading(true);
     try {
       await registerUser(userName, email, password);
     } catch (err: any) {
       setInputErrors([err.message]);
     }
+    setIsLoading(false);
   };
 
   const hasSpace = (str: string): boolean => {
@@ -76,6 +86,14 @@ const RegisterScreen = () => {
     setInputErrors(newInputErrors);
     return !newInputErrors.length;
   };
+
+  if (isLoading) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center" }}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
 
   return (
     <>

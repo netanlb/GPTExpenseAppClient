@@ -1,14 +1,19 @@
 import { View, StyleSheet, ScrollView } from "react-native";
 import FragmentOne from "./FragmentOne";
 import FragmentTwo from "./FragmentTwo";
-import { ExpenseProvider } from "../../context";
 
 const HomeScreen = () => {
   return (
-  <ScrollView stickyHeaderIndices={[0]}>
-    <FragmentOne />
-    <FragmentTwo />
-  </ScrollView>
+    <View style={styles.container}>
+      <FragmentOne />
+      <FragmentTwo />
+    </View>
   );
 };
 export default HomeScreen;
+
+const styles = StyleSheet.create({
+  container: {
+    marginBottom: 160, // Adjust the value accordingly
+  },
+});

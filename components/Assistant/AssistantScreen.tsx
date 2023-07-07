@@ -2,7 +2,9 @@ import { Text, StyleSheet, View } from "react-native";
 import { useState, useContext } from "react";
 import { GiftedChat } from "react-native-gifted-chat";
 import { ExpenseContext } from "../../context";
-import { GPT_API_KEY_ADAM as GPT_API_KEY } from "@env";
+// import { GPT_API_KEY_ADAM as GPT_API_KEY } from "@env";
+//@ts-ignore
+import { GPT_API_KEY } from "@env";
 
 const AssistantScreen = () => {
   const { expenseList } = useContext(ExpenseContext);
@@ -38,12 +40,13 @@ const AssistantScreen = () => {
       const userMessageContent = userMessage.text;
 
       if (!expenseList.length) return;
+
       const response = await fetch(
         "https://api.openai.com/v1/chat/completions",
         {
           method: "POST",
           headers: {
-            Authorization: `Bearer ${GPT_API_KEY}`, // Replace with your actual API Key
+            Authorization: `Bearer ${GPT_API_KEY}`,
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
@@ -52,7 +55,7 @@ const AssistantScreen = () => {
               { role: "system", content: systemMessage },
               { role: "user", content: userMessageContent },
             ],
-            max_tokens: 100,
+            max_tokens: 50,
           }),
         }
       );
