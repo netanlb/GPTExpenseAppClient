@@ -13,6 +13,7 @@ const FragmentOne: React.FC = () => {
   useEffect(() => {
     generateChatGptTip();
   }, []);
+
   const getCurrentMonthAndYear = () => {
     const date = new Date();
     return ["" + date.getMonth(), "" + date.getFullYear()];
@@ -27,7 +28,7 @@ const FragmentOne: React.FC = () => {
     const systemMessage = `My expenses are as follows: ${currentMonthExpenses
       .map(
         (expense) =>
-          `On ${parseDate(expense.date)}, I spent ${expense.sum} shekels on ${
+          `On ${parseDate(expense.date!)}, I spent ${expense.sum} shekels on ${
             expense.category
           } which was for ${expense.description}.`
       )

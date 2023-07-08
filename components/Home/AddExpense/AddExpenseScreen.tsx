@@ -24,7 +24,7 @@ const AddExpenseScreen: React.FC<AddExpenseScreenProps> = ({
   route,
 }) => {
   useEffect(() => {
-    if (route?.params?.editExpense) {
+    if (route?.params?.editExpense?._id) {
       setExpense(route.params.editExpense);
       setIsEdit(true);
     } else {
@@ -56,6 +56,7 @@ const AddExpenseScreen: React.FC<AddExpenseScreenProps> = ({
   const onSubmitExpense = (): void => {
     if (!areAllFieldsFilled()) return;
 
+    console.log(isEdit);
     isEdit ? updateExpense(expense) : addExpense(expense);
     navigation.navigate("HomeScreen", {});
   };
@@ -121,7 +122,11 @@ const AddExpenseScreen: React.FC<AddExpenseScreenProps> = ({
       <Text>Date</Text>
       <Button title="Pick a Date" onPress={() => setMode("date")}></Button>
       {mode && (
-        <DateTimePicker value={expense.date} mode={mode} onChange={onChange} />
+        <DateTimePicker
+          value={expense.date ?? new Date()}
+          mode={mode}
+          onChange={onChange}
+        />
       )}
       <View style={{ marginBottom: 60 }}></View>
       <Button title="+ Add" onPress={onSubmitExpense} />

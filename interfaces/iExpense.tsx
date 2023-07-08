@@ -3,5 +3,5 @@ export interface IExpense {
   sum: number | null;
   description: string;
   category: string;
-  date: Date;
+  date: Date | null;
 }
