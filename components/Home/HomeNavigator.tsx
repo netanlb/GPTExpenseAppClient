@@ -55,7 +55,7 @@ const HomeNavigator = () => {
             sum: null,
             description: "",
             category: "",
-            date: new Date(),
+            date: null,
           } as IExpense,
         }}
       ></Stack.Screen>
