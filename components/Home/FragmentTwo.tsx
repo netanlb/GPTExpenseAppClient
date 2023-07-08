@@ -11,8 +11,14 @@ import { IExpense } from "../../interfaces/iExpense";
 import { ExpenseContext } from "../../context";
 import { SwipeListView } from "react-native-swipe-list-view";
 import Icon from "react-native-vector-icons/FontAwesome";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RootStackParamList } from "./HomeNavigator";
 
-const FragmentTwo: React.FC = () => {
+interface FragmentTwoProps {
+  navigation: NativeStackNavigationProp<RootStackParamList, "AddExpenseScreen">;
+}
+
+const FragmentTwo: React.FC<FragmentTwoProps> = ({ navigation }) => {
   const { expenseList, deleteExpense, isLoading } = useContext(ExpenseContext);
 
   const deleteItem = async (id: string) => {
@@ -32,6 +38,10 @@ const FragmentTwo: React.FC = () => {
       ],
       { cancelable: false }
     );
+  };
+
+  const editItem = async (item: IExpense) => {
+    navigation.navigate("AddExpenseScreen", { editExpense: item });
   };
 
   if (isLoading) {
@@ -71,12 +81,18 @@ const FragmentTwo: React.FC = () => {
             >
               <Icon name="trash" color={"white"} size={20}></Icon>
             </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.editBtn}
+              onPress={() => editItem(item)}
+            >
+              <Icon name="edit" color={"white"} size={20}></Icon>
+            </TouchableOpacity>
           </View>
         )}
-        stopRightSwipe={-70}
+        stopRightSwipe={-130}
         stopLeftSwipe={30}
         leftOpenValue={0}
-        rightOpenValue={-60}
+        rightOpenValue={-120}
       />
     </View>
   );
@@ -104,12 +120,8 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   rowBack: {
-    alignItems: "center",
-    backgroundColor: "#DDD",
     flex: 1,
     flexDirection: "row",
-    justifyContent: "space-between",
-    paddingLeft: 15,
   },
   deleteBtn: {
     alignItems: "center",
@@ -121,6 +133,17 @@ const styles = StyleSheet.create({
     height: 60,
     width: 60,
     right: 0,
+  },
+  editBtn: {
+    alignItems: "center",
+    backgroundColor: "gray",
+    bottom: 0,
+    justifyContent: "center",
+    position: "absolute",
+    top: 0,
+    height: 60,
+    width: 60,
+    right: 60,
   },
 });
 

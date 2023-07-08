@@ -122,6 +122,34 @@ const ExpenseProvider: React.FC<ExpenseProviderProps> = ({ children }) => {
     setIsLoading(false);
   };
 
+  const updateExpense = async (expense: IExpense) => {
+    setIsLoading(true);
+    try {
+      const url = `${serverURL}/cost/${expense._id}`; // Adjust URL as needed
+      const body = { ...expense, user_id: userId };
+      const res = await fetch(url, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+      });
+
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+
+      const newExpense: IExpense = await res.json(); // Assuming the API returns the added expense
+      setExpenseList((prevExpenseList) => [
+        newExpense,
+        ...prevExpenseList.filter((item) => item._id !== expense._id),
+      ]);
+    } catch (err) {
+      console.error(err);
+    }
+    setIsLoading(false);
+  };
+
   const deleteExpense = async (id: string) => {
     setIsLoading(true);
     try {
@@ -159,6 +187,7 @@ const ExpenseProvider: React.FC<ExpenseProviderProps> = ({ children }) => {
       value={{
         expenseList,
         addExpense,
+        updateExpense,
         deleteExpense,
         fetchExpenses,
         fetchGroupedExpenses,

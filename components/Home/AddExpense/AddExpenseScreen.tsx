@@ -6,37 +6,33 @@ import { ExpenseContext } from "../../../context";
 import { IExpense } from "../../../interfaces/iExpense";
 import { RootStackParamList } from "../HomeNavigator";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { generateExpenses } from "./utils";
+import { RouteProp } from "@react-navigation/native";
 
-// const itemList = generateExpenses(20);
+type NavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  "AddExpenseScreen"
+>;
+type AddExpenseRouteProp = RouteProp<RootStackParamList, "AddExpenseScreen">;
 
-interface AddExpenseProps {
-  navigation: NativeStackNavigationProp<RootStackParamList, "AddExpenseScreen">;
-}
+type AddExpenseScreenProps = {
+  navigation: NavigationProp;
+  route?: AddExpenseRouteProp;
+};
 
-const AddExpenseScreen: React.FC<AddExpenseProps> = ({ navigation }) => {
-  // useEffect(() => {
-  //   console.log("adding expenses...");
-  //   const itemList = generateExpenses(20);
+const AddExpenseScreen: React.FC<AddExpenseScreenProps> = ({
+  navigation,
+  route,
+}) => {
+  useEffect(() => {
+    if (route?.params?.editExpense) {
+      setExpense(route.params.editExpense);
+      setIsEdit(true);
+    } else {
+      setIsEdit(false);
+    }
+  }, [route?.params?.editExpense]);
 
-  //   async function addItems() {
-  //     for (const item of itemList) {
-  //       console.log(item);
-  //       try {
-  //         await addExpense(item);
-  //         console.log("made api call");
-  //         // Delay of 500ms between each API call
-  //         await new Promise((resolve) => setTimeout(resolve, 500));
-  //       } catch (error) {
-  //         console.error(error);
-  //       }
-  //     }
-  //   }
-
-  //   addItems();
-  // }, []);
-
-  const { addExpense } = useContext(ExpenseContext);
+  const { addExpense, updateExpense } = useContext(ExpenseContext);
 
   const [expense, setExpense] = useState<IExpense>({
     description: "",
@@ -44,6 +40,8 @@ const AddExpenseScreen: React.FC<AddExpenseProps> = ({ navigation }) => {
     category: "",
     date: new Date(),
   });
+
+  const [isEdit, setIsEdit] = useState<boolean>(false);
 
   const [mode, setMode] = useState<
     "date" | "countdown" | "time" | "datetime" | null
@@ -57,10 +55,8 @@ const AddExpenseScreen: React.FC<AddExpenseProps> = ({ navigation }) => {
 
   const onSubmitExpense = (): void => {
     if (!areAllFieldsFilled()) return;
-    setExpense({
-      ...expense,
-    });
-    addExpense(expense);
+
+    isEdit ? updateExpense(expense) : addExpense(expense);
     navigation.navigate("HomeScreen", {});
   };
 

@@ -4,6 +4,7 @@ import { IExpense } from "../../interfaces/iExpense";
 export interface IExpenseContextData {
   expenseList: IExpense[];
   addExpense: (expense: IExpense) => void;
+  updateExpense: (expense: IExpense) => void;
   deleteExpense: (expenseId: string) => void;
   fetchExpenses: (queryParams?: {
     [key: string]: string[];
@@ -16,6 +17,7 @@ export interface IExpenseContextData {
 const ExpenseContext = React.createContext<IExpenseContextData>({
   expenseList: [],
   addExpense: () => {},
+  updateExpense: () => {},
   deleteExpense: () => {},
   fetchExpenses: () => Promise.resolve([]),
   fetchGroupedExpenses: () => Promise.resolve([]),

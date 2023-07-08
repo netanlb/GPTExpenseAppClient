@@ -4,12 +4,13 @@ import { View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import AddExpenseScreen from "./AddExpense/AddExpenseScreen";
 import FilterScreen from "./Filter/FilterScreen";
-import ExpenseProvider from "../../context/Expense/ExpenseProvider";
+import { IExpense } from "../../interfaces/iExpense";
 
 export type RootStackParamList = {
   HomeScreen: {};
-  AddExpenseScreen: {};
+  AddExpenseScreen: { editExpense?: IExpense };
   FilterScreen: {};
+  FragmentTwo: {};
 };
 
 const Stack = createNativeStackNavigator();
@@ -46,7 +47,17 @@ const HomeNavigator = () => {
         options={{
           title: "Add Expense",
         }}
+        // @ts-ignore
         component={AddExpenseScreen}
+        initialParams={{
+          editExpense: {
+            _id: "",
+            sum: null,
+            description: "",
+            category: "",
+            date: new Date(),
+          } as IExpense,
+        }}
       ></Stack.Screen>
       <Stack.Screen
         name="FilterScreen"
