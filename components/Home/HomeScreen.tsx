@@ -5,7 +5,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "./HomeNavigator";
 
 interface HomeScreenProps {
-  navigation: NativeStackNavigationProp<RootStackParamList, "AddExpenseScreen">;
+  navigation: NativeStackNavigationProp<RootStackParamList, "HomeScreen">;
 }
 
 const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {

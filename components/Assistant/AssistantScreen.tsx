@@ -2,9 +2,14 @@ import { Text, StyleSheet, View } from "react-native";
 import { useState, useContext } from "react";
 import { GiftedChat } from "react-native-gifted-chat";
 import { ExpenseContext } from "../../context";
-// import { GPT_API_KEY_ADAM as GPT_API_KEY } from "@env";
-//@ts-ignore
-import { GPT_API_KEY } from "@env";
+import { DEV_SERVER_URL, PROD_SERVER_URL } from "@env";
+
+let serverURL: string;
+if (__DEV__) {
+  serverURL = DEV_SERVER_URL;
+} else {
+  serverURL = PROD_SERVER_URL;
+}
 
 const AssistantScreen = () => {
   const { expenseList } = useContext(ExpenseContext);
@@ -29,7 +34,7 @@ const AssistantScreen = () => {
       const systemMessage = `The user has the following expenses: ${expenseList
         .map(
           (expense) =>
-            `On ${parseDate(expense.date)}, they spent ${
+            `On ${parseDate(expense.date!)}, they spent ${
               expense.sum
             } shekels on ${expense.category} which was for ${
               expense.description
@@ -40,28 +45,23 @@ const AssistantScreen = () => {
       const userMessageContent = userMessage.text;
 
       if (!expenseList.length) return;
-
-      const response = await fetch(
-        "https://api.openai.com/v1/chat/completions",
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${GPT_API_KEY}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            model: "gpt-3.5-turbo",
-            messages: [
-              { role: "system", content: systemMessage },
-              { role: "user", content: userMessageContent },
-            ],
-            max_tokens: 50,
-          }),
-        }
-      );
+      console.log(serverURL);
+      const response = await fetch(`${serverURL}/openai`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "gpt-3.5-turbo",
+          messages: [
+            { role: "system", content: systemMessage },
+            { role: "user", content: userMessageContent },
+          ],
+          max_tokens: 250,
+        }),
+      });
 
       const data = await response.json();
-
       if (data.error) {
         const botMessage: any = {
           _id: new Date().getTime() + 1,

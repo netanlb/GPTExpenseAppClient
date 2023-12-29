@@ -20,12 +20,12 @@ const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   const [user, setUser] = useState<any>(null);
 
   const loginUser = async (email: string, password: string): Promise<void> => {
+    console.log(serverURL);
     const url: string = `${serverURL}/auth`;
     const body: { [key: string]: any } = {
       email,
       password,
     };
-
     const res: Response = await fetch(url, {
       method: "POST",
       headers: {

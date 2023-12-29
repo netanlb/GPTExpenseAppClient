@@ -1,7 +1,14 @@
 import React, { useRef, useContext, useEffect, useState } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { ExpenseContext, UserContext } from "../../context";
-import { GPT_API_KEY_ADAM as GPT_API_KEY } from "@env";
+import { DEV_SERVER_URL, PROD_SERVER_URL } from "@env";
+
+let serverURL: string;
+if (__DEV__) {
+  serverURL = DEV_SERVER_URL;
+} else {
+  serverURL = PROD_SERVER_URL;
+}
 
 type ViewRef = React.RefObject<View>;
 
@@ -35,9 +42,8 @@ const FragmentOne: React.FC = () => {
       .join(" ")}`;
 
     const userMessage =
-      "generate a fact about my expenses this month, it could be a crictism, humorous comment, informative observation, warning of bad or encouragement of good behavior, no longer than 12 words, refer to the user as 'you'.";
+      "generate a fact about my expenses this month, informative observation, no longer than 12 words, refer to the user as 'you'.";
 
-    const url = "https://api.openai.com/v1/chat/completions";
     const body = {
       model: "gpt-3.5-turbo",
       messages: [
@@ -48,10 +54,10 @@ const FragmentOne: React.FC = () => {
     };
 
     try {
-      const response = await fetch(url, {
+      console.log(serverURL);
+      const response = await fetch(`${serverURL}/openai`, {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${GPT_API_KEY}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify(body),
