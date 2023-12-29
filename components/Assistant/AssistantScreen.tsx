@@ -45,7 +45,7 @@ const AssistantScreen = () => {
       const userMessageContent = userMessage.text;
 
       if (!expenseList.length) return;
-
+      console.log(serverURL);
       const response = await fetch(`${serverURL}/openai`, {
         method: "POST",
         headers: {
@@ -62,7 +62,6 @@ const AssistantScreen = () => {
       });
 
       const data = await response.json();
-
       if (data.error) {
         const botMessage: any = {
           _id: new Date().getTime() + 1,

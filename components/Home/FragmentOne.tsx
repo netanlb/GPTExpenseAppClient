@@ -44,7 +44,6 @@ const FragmentOne: React.FC = () => {
     const userMessage =
       "generate a fact about my expenses this month, informative observation, no longer than 12 words, refer to the user as 'you'.";
 
-    const url = "https://api.openai.com/v1/chat/completions";
     const body = {
       model: "gpt-3.5-turbo",
       messages: [
@@ -55,6 +54,7 @@ const FragmentOne: React.FC = () => {
     };
 
     try {
+      console.log(serverURL);
       const response = await fetch(`${serverURL}/openai`, {
         method: "POST",
         headers: {

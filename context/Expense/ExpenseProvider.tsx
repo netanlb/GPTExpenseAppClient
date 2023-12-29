@@ -30,6 +30,7 @@ const ExpenseProvider: React.FC<ExpenseProviderProps> = ({ children }) => {
     month?: number
   ): Promise<any[]> => {
     try {
+      console.log(serverURL);
       let url = new URL(`${serverURL}/cost/groupBy`);
       url.searchParams.append("user_id", userId!);
       if (year) url.searchParams.append("year", year.toString());
@@ -58,6 +59,7 @@ const ExpenseProvider: React.FC<ExpenseProviderProps> = ({ children }) => {
     [key: string]: string[];
   }): Promise<IExpense[]> => {
     try {
+      console.log("fetching...");
       let url = new URL(`${serverURL}/cost`);
       url.searchParams.append("user_id", userId!);
 
