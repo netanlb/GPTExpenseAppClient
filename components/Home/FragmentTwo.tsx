@@ -15,7 +15,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "./HomeNavigator";
 
 interface FragmentTwoProps {
-  navigation: NativeStackNavigationProp<RootStackParamList, "AddExpenseScreen">;
+  navigation: NativeStackNavigationProp<RootStackParamList>;
 }
 
 const FragmentTwo: React.FC<FragmentTwoProps> = ({ navigation }) => {
@@ -68,7 +68,7 @@ const FragmentTwo: React.FC<FragmentTwoProps> = ({ navigation }) => {
                 {expense.sum!.toFixed(2)}
               </Text>
               <Text style={styles.expenseDetails}>
-                {new Date(expense.date).toLocaleDateString()}
+                {new Date(expense.date!).toLocaleDateString()}
               </Text>
             </View>
           </View>
