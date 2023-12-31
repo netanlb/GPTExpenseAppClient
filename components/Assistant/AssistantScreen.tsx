@@ -31,35 +31,44 @@ const AssistantScreen = () => {
       );
 
       // Create prompt for GPT based on the user's message and expenses
-      const systemMessage = `The user has the following expenses: ${expenseList
-        .map(
-          (expense) =>
-            `On ${parseDate(expense.date!)}, they spent ${
-              expense.sum
-            } shekels on ${expense.category} which was for ${
-              expense.description
-            }.`
-        )
-        .join(" ")}`;
+      let systemMessage;
+
+      if (expenseList.length) {
+        systemMessage = `You are a motivational advisor who inspires positive financial decisions and habits. This month's expenses include: ${expenseList
+          .map(
+            (expense) =>
+              `On ${parseDate(expense.date!)}, ${
+                expense.sum
+              } shekels were spent on ${expense.category} for ${
+                expense.description
+              }.`
+          )
+          .join(" ")}`;
+      } else {
+        systemMessage =
+          "You are a motivational advisor who inspires positive financial decisions and habits.";
+      }
 
       const userMessageContent = userMessage.text;
 
       if (!expenseList.length) return;
-      console.log(serverURL);
-      const response = await fetch(`${serverURL}/openai`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model: "gpt-3.5-turbo",
-          messages: [
-            { role: "system", content: systemMessage },
-            { role: "user", content: userMessageContent },
-          ],
-          max_tokens: 250,
-        }),
-      });
+      const response = await fetch(
+        `${process.env.API_URL ?? serverURL}/openai`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model: "gpt-3.5-turbo",
+            messages: [
+              { role: "system", content: systemMessage },
+              { role: "user", content: userMessageContent },
+            ],
+            max_tokens: 250,
+          }),
+        }
+      );
 
       const data = await response.json();
       if (data.error) {

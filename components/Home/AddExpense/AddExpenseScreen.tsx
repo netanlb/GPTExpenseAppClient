@@ -48,7 +48,20 @@ const AddExpenseScreen: React.FC<AddExpenseScreenProps> = ({
   >(null);
 
   const onChange = (event: any, selectedDate?: Date) => {
-    const currentDate = selectedDate || expense.date;
+    let currentDate = selectedDate
+      ? new Date(selectedDate)
+      : new Date(expense.date!);
+
+    // Set time to start of the day in local timezone
+    currentDate.setHours(0, 0, 0, 0);
+
+    // Adjust for the timezone offset to align with UTC
+    // Since Israel is UTC+2, the offset is negative
+    const timezoneOffsetInMinutes = currentDate.getTimezoneOffset();
+    currentDate = new Date(
+      currentDate.getTime() - timezoneOffsetInMinutes * 60000
+    );
+
     setMode(null); // Hide the picker after selection
     setExpense({ ...expense, date: currentDate });
   };

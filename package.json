@@ -35,7 +35,9 @@
     "react-native-svg": "13.4.0",
     "react-native-swipe-list-view": "^3.2.9",
     "react-native-web": "~0.18.7",
-    "victory-native": "^36.7.0"
+    "victory-native": "^36.7.0",
+    "expo-updates": "~0.15.6",
+    "expo-dev-client": "~2.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.19.3",
