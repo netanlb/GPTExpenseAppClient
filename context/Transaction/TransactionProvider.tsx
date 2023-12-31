@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useContext } from "react";
-import { IExpense } from "../../interfaces/iExpense";
-import ExpenseContext from "./ExpenseContext";
+import { Transaction } from "../../interfaces/transaction.type";
+import TransactionContext from "./TransactionContext";
 import UserContext from "../User/UserContext";
 import { DEV_SERVER_URL, PROD_SERVER_URL } from "@env";
 
-interface ExpenseProviderProps {
+interface TransactionProviderProps {
   children: React.ReactNode;
 }
 
@@ -15,22 +15,26 @@ if (__DEV__) {
   serverURL = PROD_SERVER_URL; // In production, use the production URL
 }
 
-const ExpenseProvider: React.FC<ExpenseProviderProps> = ({ children }) => {
-  const [expenseList, setExpenseList] = useState<IExpense[]>([]);
+const TransactionProvider: React.FC<TransactionProviderProps> = ({
+  children,
+}) => {
+  const [transactionList, setTransactionList] = useState<Transaction[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const { userId } = useContext(UserContext); // Access the userId from UserContext
 
   useEffect(() => {
     const [month, year] = getCurrentMonthAndYear();
-    resetExpenses({ month: ["" + month], year: ["" + year] });
-  }, [userId]); // Add userId as a dependency so that expenses are refetched whenever the user changes
+    resetTransactions({ month: ["" + month], year: ["" + year] });
+  }, [userId]); // Add userId as a dependency so that transactions are refetched whenever the user changes
 
-  const fetchGroupedExpenses = async (
+  const fetchGroupedTransactions = async (
     year?: number,
     month?: number
   ): Promise<any[]> => {
     try {
-      let url = new URL(`${process.env.API_URL ?? serverURL}/cost/groupBy`);
+      let url = new URL(
+        `${process.env.API_URL ?? serverURL}/transaction/groupBy`
+      );
       url.searchParams.append("user_id", userId!);
       if (year) url.searchParams.append("year", year.toString());
       if (month) url.searchParams.append("month", month.toString());
@@ -46,21 +50,20 @@ const ExpenseProvider: React.FC<ExpenseProviderProps> = ({ children }) => {
         throw new Error(`HTTP error! status: ${res.status}`);
       }
 
-      const groupedExpenses = await res.json();
-      return groupedExpenses;
+      const groupedTransactions = await res.json();
+      return groupedTransactions;
     } catch (error) {
-      console.log(error);
+      console.error(error);
       return [];
     }
   };
 
-  const fetchExpenses = async (queryParams?: {
+  const fetchTransactions = async (queryParams?: {
     [key: string]: string[];
-  }): Promise<IExpense[]> => {
+  }): Promise<Transaction[]> => {
     try {
-      let url = new URL(`${process.env.API_URL ?? serverURL}/cost`);
+      let url = new URL(`${process.env.API_URL ?? serverURL}/transaction`);
       url.searchParams.append("user_id", userId!);
-
       if (queryParams) {
         Object.entries(queryParams).forEach(
           ([key, values]: [string, string[]]) => {
@@ -82,27 +85,28 @@ const ExpenseProvider: React.FC<ExpenseProviderProps> = ({ children }) => {
         throw new Error(`HTTP error! status: ${res.status}`);
       }
 
-      const expenses: IExpense[] = await res.json();
-      console.log(expenses);
-      return expenses;
+      const transactions: Transaction[] = await res.json();
+      return transactions;
     } catch (err) {
       console.error(err);
       return [];
     }
   };
 
-  const resetExpenses = async (queryParams?: { [key: string]: string[] }) => {
+  const resetTransactions = async (queryParams?: {
+    [key: string]: string[];
+  }) => {
     setIsLoading(true);
-    const expenses = await fetchExpenses(queryParams);
-    setExpenseList(expenses);
+    const transactions = await fetchTransactions(queryParams);
+    setTransactionList(transactions);
     setIsLoading(false);
   };
 
-  const addExpense = async (expense: IExpense) => {
+  const addTransaction = async (transaction: Transaction) => {
     setIsLoading(true);
     try {
-      const url = `${process.env.API_URL ?? serverURL}/cost`; // Adjust URL as needed
-      const body = { ...expense, user_id: userId };
+      const url = `${process.env.API_URL ?? serverURL}/transaction`; // Adjust URL as needed
+      const body = { ...transaction, user_id: userId };
       const res = await fetch(url, {
         method: "POST",
         headers: {
@@ -115,19 +119,24 @@ const ExpenseProvider: React.FC<ExpenseProviderProps> = ({ children }) => {
         throw new Error(`HTTP error! status: ${res.status}`);
       }
 
-      const newExpense: IExpense = await res.json(); // Assuming the API returns the added expense
-      setExpenseList((prevExpenseList) => [newExpense, ...prevExpenseList]);
+      const newTransaction: Transaction = await res.json(); // Assuming the API returns the added transaction
+      setTransactionList((prevTransactionList) => [
+        newTransaction,
+        ...prevTransactionList,
+      ]);
     } catch (err) {
       console.error(err);
     }
     setIsLoading(false);
   };
 
-  const updateExpense = async (expense: IExpense) => {
+  const updateTransaction = async (transaction: Transaction) => {
     setIsLoading(true);
     try {
-      const url = `${process.env.API_URL ?? serverURL}/cost/${expense._id}`; // Adjust URL as needed
-      const body = { ...expense, user_id: userId };
+      const url = `${process.env.API_URL ?? serverURL}/transaction/${
+        transaction._id
+      }`; // Adjust URL as needed
+      const body = { ...transaction, user_id: userId };
       const res = await fetch(url, {
         method: "PUT",
         headers: {
@@ -140,10 +149,10 @@ const ExpenseProvider: React.FC<ExpenseProviderProps> = ({ children }) => {
         throw new Error(`HTTP error! status: ${res.status}`);
       }
 
-      const newExpense: IExpense = await res.json(); // Assuming the API returns the added expense
-      setExpenseList((prevExpenseList) => [
-        newExpense,
-        ...prevExpenseList.filter((item) => item._id !== expense._id),
+      const newTransaction: Transaction = await res.json(); // Assuming the API returns the added transaction
+      setTransactionList((prevTransactionList) => [
+        newTransaction,
+        ...prevTransactionList.filter((item) => item._id !== transaction._id),
       ]);
     } catch (err) {
       console.error(err);
@@ -151,10 +160,12 @@ const ExpenseProvider: React.FC<ExpenseProviderProps> = ({ children }) => {
     setIsLoading(false);
   };
 
-  const deleteExpense = async (id: string) => {
+  const deleteTransaction = async (id: string) => {
     setIsLoading(true);
     try {
-      const url = new URL(`${process.env.API_URL ?? serverURL}/cost/${id}`);
+      const url = new URL(
+        `${process.env.API_URL ?? serverURL}/transaction/${id}`
+      );
 
       const res = await fetch(url, {
         method: "DELETE",
@@ -168,12 +179,12 @@ const ExpenseProvider: React.FC<ExpenseProviderProps> = ({ children }) => {
       }
 
       // delete on the client
-      const newExpenseList = expenseList.filter(
-        (expense) => expense._id !== id
+      const newTransactionList = transactionList.filter(
+        (transaction) => transaction._id !== id
       );
-      setExpenseList(newExpenseList);
+      setTransactionList(newTransactionList);
     } catch (error: any) {
-      console.log(error.message);
+      console.error(error.message);
     }
     setIsLoading(false);
   };
@@ -184,21 +195,21 @@ const ExpenseProvider: React.FC<ExpenseProviderProps> = ({ children }) => {
   };
 
   return (
-    <ExpenseContext.Provider
+    <TransactionContext.Provider
       value={{
-        expenseList,
-        addExpense,
-        updateExpense,
-        deleteExpense,
-        fetchExpenses,
-        fetchGroupedExpenses,
-        resetExpenses,
+        transactionList,
+        addTransaction,
+        updateTransaction,
+        deleteTransaction,
+        fetchTransactions,
+        fetchGroupedTransactions,
+        resetTransactions,
         isLoading,
       }}
     >
       {children}
-    </ExpenseContext.Provider>
+    </TransactionContext.Provider>
   );
 };
 
-export default ExpenseProvider;
+export default TransactionProvider;

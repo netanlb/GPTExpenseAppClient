@@ -51,7 +51,7 @@ const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     email: string,
     password: string
   ): Promise<void> => {
-    const url: string = `${process.env.API_URL ?? serverURL}/users`;
+    const url: string = `${process.env.API_URL ?? serverURL}/user`;
     const body: { [key: string]: any } = {
       name,
       email,
@@ -91,7 +91,7 @@ const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     try {
       await AsyncStorage.setItem("@user", JSON.stringify(user));
     } catch (error: any) {
-      console.log(error.message);
+      console.error(error.message);
     }
   };
 
@@ -99,7 +99,7 @@ const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     try {
       await AsyncStorage.removeItem("@user");
     } catch (error: any) {
-      console.log(error.message);
+      console.error(error.message);
     }
   };
 

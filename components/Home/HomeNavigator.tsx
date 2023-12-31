@@ -2,13 +2,13 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import HomeScreen from "./HomeScreen";
 import { View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import AddExpenseScreen from "./AddExpense/AddExpenseScreen";
+import AddTransactionScreen from "./AddTransaction/AddTransactionScreen";
 import FilterScreen from "./Filter/FilterScreen";
-import { IExpense } from "../../interfaces/iExpense";
+import { Transaction } from "../../interfaces/transaction.type";
 
 export type RootStackParamList = {
   HomeScreen: {};
-  AddExpenseScreen: { editExpense?: IExpense };
+  AddTransactionScreen: { editTransaction?: Transaction };
   FilterScreen: {};
   FragmentTwo: {};
 };
@@ -36,27 +36,27 @@ const HomeNavigator = () => {
                 name="add-circle"
                 size={30}
                 color="#007AFF"
-                onPress={() => navigation.navigate("AddExpenseScreen")}
+                onPress={() => navigation.navigate("AddTransactionScreen")}
               />
             </View>
           ),
         })}
       ></Stack.Screen>
       <Stack.Screen
-        name="AddExpenseScreen"
+        name="AddTransactionScreen"
         options={{
-          title: "Add Expense",
+          title: "Add Transaction",
         }}
         // @ts-ignore
-        component={AddExpenseScreen}
+        component={AddTransactionScreen}
         initialParams={{
-          editExpense: {
+          editTransaction: {
             _id: "",
             sum: null,
             description: "",
             category: "",
             date: null,
-          } as IExpense,
+          } as Transaction,
         }}
       ></Stack.Screen>
       <Stack.Screen

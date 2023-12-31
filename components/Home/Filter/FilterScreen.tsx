@@ -8,21 +8,25 @@ import {
   FlatList,
   Button,
 } from "react-native";
-import { ExpenseContext } from "../../../context";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../HomeNavigator";
 import { ActivityIndicator } from "react-native-paper";
+import TransactionContext from "../../../context/Transaction/TransactionContext";
 
 interface FilterProps {
   navigation: NativeStackNavigationProp<RootStackParamList, "FilterScreen">;
 }
 
 const FilterScreen: React.FC<FilterProps> = ({ navigation }) => {
-  const { resetExpenses, fetchExpenses, isLoading } =
-    useContext(ExpenseContext);
+  const { resetTransactions, fetchTransactions, isLoading } =
+    useContext(TransactionContext);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedMonths, setSelectedMonths] = useState<string[]>([]);
   const [selectedYears, setSelectedYears] = useState<string[]>([]);
+  const [selectedTransactionTypes, setSelectedTransactionTypes] = useState<
+    string[]
+  >([]);
+
   const [isFiltersInitialized, setIsFiltersInitialized] = useState(false);
 
   const [inputErrors, setInputErrors] = useState<string[]>([]);
@@ -45,31 +49,39 @@ const FilterScreen: React.FC<FilterProps> = ({ navigation }) => {
   const categoriesRef = useRef<string[]>([]);
   const monthsRef = useRef<string[]>([]);
   const yearsRef = useRef<string[]>([]);
+  const transactionTypesRef = useRef<string[]>([]);
 
   useEffect(() => {
     async function initializeFilters() {
-      const allExpenses = await fetchExpenses();
+      const allTransactions = await fetchTransactions();
       categoriesRef.current = [
-        ...new Set(allExpenses.map((expense) => expense["category"])),
+        ...new Set(
+          allTransactions.map((transaction) => transaction["category"])
+        ),
       ];
       monthsRef.current = [
         ...new Set(
-          allExpenses.map(
-            (expense) =>
-              new Date(expense["date"]!).getMonth() ?? new Date().getMonth()
+          allTransactions.map(
+            (transaction) =>
+              new Date(transaction["date"]!).getMonth() ?? new Date().getMonth()
           )
         ),
       ].map((monthIndex) => Object.keys(monthsMap)[monthIndex]);
       yearsRef.current = [
         ...new Set(
-          allExpenses.map(
-            (expense) =>
-              new Date(expense["date"]!).getFullYear().toString() ??
+          allTransactions.map(
+            (transaction) =>
+              new Date(transaction["date"]!).getFullYear().toString() ??
               new Date().getFullYear().toString()
           )
         ),
       ];
 
+      transactionTypesRef.current = [
+        ...new Set(
+          allTransactions.map((transaction) => transaction["transactionType"])
+        ),
+      ];
       setIsFiltersInitialized(true);
     }
 
@@ -82,6 +94,7 @@ const FilterScreen: React.FC<FilterProps> = ({ navigation }) => {
       category: selectedCategories.map((item) => item),
       month: selectedMonths.map((item: string) => "" + monthsMap[item]),
       year: selectedYears,
+      transactionType: selectedTransactionTypes.map((item) => item),
     };
 
     // clear empty arrays
@@ -89,7 +102,7 @@ const FilterScreen: React.FC<FilterProps> = ({ navigation }) => {
       !queryParamsLists[key].length && delete queryParamsLists[key];
     });
 
-    resetExpenses(queryParamsLists);
+    resetTransactions(queryParamsLists);
     navigation.navigate("HomeScreen", {});
   };
 
@@ -218,6 +231,40 @@ const FilterScreen: React.FC<FilterProps> = ({ navigation }) => {
         data={monthsRef.current}
         renderItem={(item) =>
           renderItem(item, selectedMonths, setSelectedMonths)
+        }
+        keyExtractor={(item) => item}
+        horizontal
+      />
+
+      <View style={styles.spacer}></View>
+
+      <Text style={styles.itemTitle}>Transaction Type</Text>
+
+      <TouchableOpacity
+        style={[
+          styles.toggleAll,
+          transactionTypesRef.current.length ===
+            selectedTransactionTypes.length && styles.selectedAll,
+        ]}
+        onPress={() =>
+          toggleSelectAll(
+            transactionTypesRef.current,
+            setSelectedTransactionTypes,
+            selectedTransactionTypes
+          )
+        }
+      >
+        <Text>Select All</Text>
+      </TouchableOpacity>
+
+      <FlatList
+        data={transactionTypesRef.current}
+        renderItem={(item) =>
+          renderItem(
+            item,
+            selectedTransactionTypes,
+            setSelectedTransactionTypes
+          )
         }
         keyExtractor={(item) => item}
         horizontal

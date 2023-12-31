@@ -1,7 +1,8 @@
 import React, { useRef, useContext, useEffect, useState } from "react";
 import { View, Text, StyleSheet } from "react-native";
-import { ExpenseContext, UserContext } from "../../context";
 import { DEV_SERVER_URL, PROD_SERVER_URL } from "@env";
+import TransactionContext from "../../context/Transaction/TransactionContext";
+import { UserContext } from "../../context";
 
 let serverURL: string;
 if (__DEV__) {
@@ -13,7 +14,7 @@ if (__DEV__) {
 type ViewRef = React.RefObject<View>;
 
 const FragmentOne: React.FC = () => {
-  const { fetchExpenses } = useContext(ExpenseContext);
+  const { fetchTransactions } = useContext(TransactionContext);
   const { user } = useContext(UserContext);
   const [tip, setTip] = useState<string>(`Hello ${user?.name}`);
 
@@ -27,7 +28,7 @@ const FragmentOne: React.FC = () => {
   };
   const generateChatGptTip = async (): Promise<void> => {
     const [month, year] = getCurrentMonthAndYear();
-    const currentMonthExpenses = await fetchExpenses({
+    const currentMonthTransactions = await fetchTransactions({
       month: [month],
       year: [year],
     });
@@ -35,23 +36,23 @@ const FragmentOne: React.FC = () => {
     let systemMessage;
     let userMessage;
 
-    if (currentMonthExpenses.length) {
-      systemMessage = `You are a motivational advisor who inspires positive financial decisions and habits. This month's expenses include: ${currentMonthExpenses
+    if (currentMonthTransactions.length) {
+      systemMessage = `You are a motivational advisor who inspires positive financial decisions and habits. This month's transactions include: ${currentMonthTransactions
         .map(
-          (expense) =>
-            `On ${parseDate(expense.date!)}, ${
-              expense.sum
-            } shekels were spent on ${expense.category} for ${
-              expense.description
+          (transaction) =>
+            `On ${parseDate(transaction.date!)}, ${
+              transaction.sum
+            } shekels were spent on ${transaction.category} for ${
+              transaction.description
             }.`
         )
         .join(" ")}`;
 
       userMessage =
-        "Please provide a concise, informative fact or observation about these expenses, in no more than 12 words.";
+        "Please provide a concise, informative fact or observation about these transactions, in no more than 12 words.";
     } else {
       systemMessage =
-        "You are a motivational advisor who inspires positive financial decisions and habits. I haven't recorded any expenses for this month.";
+        "You are a motivational advisor who inspires positive financial decisions and habits. I haven't recorded any transactions for this month.";
       userMessage =
         "Can you provide a fun and helpful financial tip or habit that I should consider adopting? in no more than 12 words.";
     }
@@ -83,7 +84,7 @@ const FragmentOne: React.FC = () => {
         setTip(data.choices[0].message.content);
       }
     } catch (error: any) {
-      console.log(error.message);
+      console.error(error.message);
     }
   };
 
