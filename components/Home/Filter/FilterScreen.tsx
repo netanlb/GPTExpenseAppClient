@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -11,16 +11,19 @@ import {
 import { ExpenseContext } from "../../../context";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../HomeNavigator";
+import { ActivityIndicator } from "react-native-paper";
 
 interface FilterProps {
   navigation: NativeStackNavigationProp<RootStackParamList, "FilterScreen">;
 }
 
 const FilterScreen: React.FC<FilterProps> = ({ navigation }) => {
-  const { resetExpenses } = useContext(ExpenseContext);
+  const { resetExpenses, fetchExpenses, isLoading } =
+    useContext(ExpenseContext);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedMonths, setSelectedMonths] = useState<string[]>([]);
   const [selectedYears, setSelectedYears] = useState<string[]>([]);
+  const [isFiltersInitialized, setIsFiltersInitialized] = useState(false);
 
   const [inputErrors, setInputErrors] = useState<string[]>([]);
 
@@ -38,6 +41,40 @@ const FilterScreen: React.FC<FilterProps> = ({ navigation }) => {
     November: 10,
     December: 11,
   };
+
+  const categoriesRef = useRef<string[]>([]);
+  const monthsRef = useRef<string[]>([]);
+  const yearsRef = useRef<string[]>([]);
+
+  useEffect(() => {
+    async function initializeFilters() {
+      const allExpenses = await fetchExpenses();
+      categoriesRef.current = [
+        ...new Set(allExpenses.map((expense) => expense["category"])),
+      ];
+      monthsRef.current = [
+        ...new Set(
+          allExpenses.map(
+            (expense) =>
+              new Date(expense["date"]!).getMonth() ?? new Date().getMonth()
+          )
+        ),
+      ].map((monthIndex) => Object.keys(monthsMap)[monthIndex]);
+      yearsRef.current = [
+        ...new Set(
+          allExpenses.map(
+            (expense) =>
+              new Date(expense["date"]!).getFullYear().toString() ??
+              new Date().getFullYear().toString()
+          )
+        ),
+      ];
+
+      setIsFiltersInitialized(true);
+    }
+
+    initializeFilters();
+  }, []);
 
   const handleFilter = () => {
     if (!validate()) return;
@@ -65,34 +102,6 @@ const FilterScreen: React.FC<FilterProps> = ({ navigation }) => {
     }
     return true;
   };
-
-  const categories = [
-    "Housing",
-    "Utilities",
-    "Food",
-    "Transportation",
-    "Healthcare",
-    "Education",
-    "Entertainment",
-    "Personal Care",
-    "Clothing",
-    "Other",
-  ];
-  const months = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ];
-  const years = ["2022", "2023"];
 
   const toggleSelection = (
     item: string,
@@ -131,6 +140,14 @@ const FilterScreen: React.FC<FilterProps> = ({ navigation }) => {
     </TouchableOpacity>
   );
 
+  if (!isFiltersInitialized) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center" }}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
+
   return (
     <ScrollView style={styles.container}>
       <Text style={styles.itemTitle}>Category</Text>
@@ -138,17 +155,22 @@ const FilterScreen: React.FC<FilterProps> = ({ navigation }) => {
       <TouchableOpacity
         style={[
           styles.toggleAll,
-          categories.length === selectedCategories.length && styles.selectedAll,
+          categoriesRef.current.length === selectedCategories.length &&
+            styles.selectedAll,
         ]}
         onPress={() =>
-          toggleSelectAll(categories, setSelectedCategories, selectedCategories)
+          toggleSelectAll(
+            categoriesRef.current,
+            setSelectedCategories,
+            selectedCategories
+          )
         }
       >
         <Text>Select All</Text>
       </TouchableOpacity>
 
       <FlatList
-        data={categories}
+        data={categoriesRef.current}
         renderItem={(item) =>
           renderItem(item, selectedCategories, setSelectedCategories)
         }
@@ -160,15 +182,18 @@ const FilterScreen: React.FC<FilterProps> = ({ navigation }) => {
       <TouchableOpacity
         style={[
           styles.toggleAll,
-          years.length === selectedYears.length && styles.selectedAll,
+          yearsRef.current.length === selectedYears.length &&
+            styles.selectedAll,
         ]}
-        onPress={() => toggleSelectAll(years, setSelectedYears, selectedYears)}
+        onPress={() =>
+          toggleSelectAll(yearsRef.current, setSelectedYears, selectedYears)
+        }
       >
         <Text>Select All</Text>
       </TouchableOpacity>
 
       <FlatList
-        data={years}
+        data={yearsRef.current}
         renderItem={(item) => renderItem(item, selectedYears, setSelectedYears)}
         keyExtractor={(item) => item}
         horizontal
@@ -179,17 +204,18 @@ const FilterScreen: React.FC<FilterProps> = ({ navigation }) => {
       <TouchableOpacity
         style={[
           styles.toggleAll,
-          months.length === selectedMonths.length && styles.selectedAll,
+          monthsRef.current.length === selectedMonths.length &&
+            styles.selectedAll,
         ]}
         onPress={() =>
-          toggleSelectAll(months, setSelectedMonths, selectedMonths)
+          toggleSelectAll(monthsRef.current, setSelectedMonths, selectedMonths)
         }
       >
         <Text>Select All</Text>
       </TouchableOpacity>
 
       <FlatList
-        data={months}
+        data={monthsRef.current}
         renderItem={(item) =>
           renderItem(item, selectedMonths, setSelectedMonths)
         }

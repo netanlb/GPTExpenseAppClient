@@ -26,8 +26,8 @@ const AppContent: React.FC = () => {
       const storageUser = jsonUser !== null ? JSON.parse(jsonUser) : null;
       if (jsonUser && storageUser === null)
         throw new Error("error retrieving user, login again");
-      console.log(serverURL);
-      const url = new URL(`${serverURL}/auth/user`);
+
+      const url = new URL(`${process.env.API_URL ?? serverURL}/auth/user`);
 
       const res: Response = await fetch(url, {
         method: "GET",

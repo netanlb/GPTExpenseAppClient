@@ -32,17 +32,29 @@ const FragmentOne: React.FC = () => {
       year: [year],
     });
 
-    const systemMessage = `My expenses are as follows: ${currentMonthExpenses
-      .map(
-        (expense) =>
-          `On ${parseDate(expense.date!)}, I spent ${expense.sum} shekels on ${
-            expense.category
-          } which was for ${expense.description}.`
-      )
-      .join(" ")}`;
+    let systemMessage;
+    let userMessage;
 
-    const userMessage =
-      "generate a fact about my expenses this month, informative observation, no longer than 12 words, refer to the user as 'you'.";
+    if (currentMonthExpenses.length) {
+      systemMessage = `You are a motivational advisor who inspires positive financial decisions and habits. This month's expenses include: ${currentMonthExpenses
+        .map(
+          (expense) =>
+            `On ${parseDate(expense.date!)}, ${
+              expense.sum
+            } shekels were spent on ${expense.category} for ${
+              expense.description
+            }.`
+        )
+        .join(" ")}`;
+
+      userMessage =
+        "Please provide a concise, informative fact or observation about these expenses, in no more than 12 words.";
+    } else {
+      systemMessage =
+        "You are a motivational advisor who inspires positive financial decisions and habits. I haven't recorded any expenses for this month.";
+      userMessage =
+        "Can you provide a fun and helpful financial tip or habit that I should consider adopting? in no more than 12 words.";
+    }
 
     const body = {
       model: "gpt-3.5-turbo",
@@ -54,14 +66,16 @@ const FragmentOne: React.FC = () => {
     };
 
     try {
-      console.log(serverURL);
-      const response = await fetch(`${serverURL}/openai`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(body),
-      });
+      const response = await fetch(
+        `${process.env.API_URL ?? serverURL}/openai`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(body),
+        }
+      );
 
       const data = await response.json();
 

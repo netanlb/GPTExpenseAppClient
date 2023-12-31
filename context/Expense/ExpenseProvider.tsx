@@ -30,8 +30,7 @@ const ExpenseProvider: React.FC<ExpenseProviderProps> = ({ children }) => {
     month?: number
   ): Promise<any[]> => {
     try {
-      console.log(serverURL);
-      let url = new URL(`${serverURL}/cost/groupBy`);
+      let url = new URL(`${process.env.API_URL ?? serverURL}/cost/groupBy`);
       url.searchParams.append("user_id", userId!);
       if (year) url.searchParams.append("year", year.toString());
       if (month) url.searchParams.append("month", month.toString());
@@ -59,8 +58,7 @@ const ExpenseProvider: React.FC<ExpenseProviderProps> = ({ children }) => {
     [key: string]: string[];
   }): Promise<IExpense[]> => {
     try {
-      console.log("fetching...");
-      let url = new URL(`${serverURL}/cost`);
+      let url = new URL(`${process.env.API_URL ?? serverURL}/cost`);
       url.searchParams.append("user_id", userId!);
 
       if (queryParams) {
@@ -85,6 +83,7 @@ const ExpenseProvider: React.FC<ExpenseProviderProps> = ({ children }) => {
       }
 
       const expenses: IExpense[] = await res.json();
+      console.log(expenses);
       return expenses;
     } catch (err) {
       console.error(err);
@@ -102,7 +101,7 @@ const ExpenseProvider: React.FC<ExpenseProviderProps> = ({ children }) => {
   const addExpense = async (expense: IExpense) => {
     setIsLoading(true);
     try {
-      const url = `${serverURL}/cost`; // Adjust URL as needed
+      const url = `${process.env.API_URL ?? serverURL}/cost`; // Adjust URL as needed
       const body = { ...expense, user_id: userId };
       const res = await fetch(url, {
         method: "POST",
@@ -127,7 +126,7 @@ const ExpenseProvider: React.FC<ExpenseProviderProps> = ({ children }) => {
   const updateExpense = async (expense: IExpense) => {
     setIsLoading(true);
     try {
-      const url = `${serverURL}/cost/${expense._id}`; // Adjust URL as needed
+      const url = `${process.env.API_URL ?? serverURL}/cost/${expense._id}`; // Adjust URL as needed
       const body = { ...expense, user_id: userId };
       const res = await fetch(url, {
         method: "PUT",
@@ -155,7 +154,7 @@ const ExpenseProvider: React.FC<ExpenseProviderProps> = ({ children }) => {
   const deleteExpense = async (id: string) => {
     setIsLoading(true);
     try {
-      const url = new URL(`${serverURL}/cost/${id}`);
+      const url = new URL(`${process.env.API_URL ?? serverURL}/cost/${id}`);
 
       const res = await fetch(url, {
         method: "DELETE",

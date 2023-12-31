@@ -27,7 +27,7 @@ const months = [
   "November",
   "December",
 ];
-const years = ["2022", "2023"];
+const years = ["2022", "2023", "2024"];
 
 const barColors = [
   "#4285F4",
