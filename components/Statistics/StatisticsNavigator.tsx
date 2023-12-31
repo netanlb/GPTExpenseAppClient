@@ -1,13 +1,12 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import StatisticsScreen from "./StatisticsScreen";
-import { ExpenseContext, ExpenseProvider, UserContext } from "../../context";
 import React, { useContext } from "react";
+import TransactionContext from "../../context/Transaction/TransactionContext";
 
 const Stack = createNativeStackNavigator();
 
 const StatisticsNavigator = () => {
-  const { expenseList } = useContext(ExpenseContext);
-  const { fetchExpenses } = useContext(ExpenseContext);
+  const { transactionList, fetchTransactions } = useContext(TransactionContext);
 
   return (
     <Stack.Navigator>

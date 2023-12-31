@@ -1,44 +1,48 @@
-import { View, Text, TextInput, StyleSheet, Button } from "react-native";
+import { View, Text, TextInput, StyleSheet, Button, Alert } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { useContext, useState, useEffect } from "react";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { ExpenseContext } from "../../../context";
-import { IExpense } from "../../../interfaces/iExpense";
+import { Transaction } from "../../../interfaces/transaction.type";
 import { RootStackParamList } from "../HomeNavigator";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RouteProp } from "@react-navigation/native";
+import TransactionContext from "../../../context/Transaction/TransactionContext";
 
 type NavigationProp = NativeStackNavigationProp<
   RootStackParamList,
-  "AddExpenseScreen"
+  "AddTransactionScreen"
 >;
-type AddExpenseRouteProp = RouteProp<RootStackParamList, "AddExpenseScreen">;
+type AddTransactionRouteProp = RouteProp<
+  RootStackParamList,
+  "AddTransactionScreen"
+>;
 
-type AddExpenseScreenProps = {
+type AddTransactionScreenProps = {
   navigation: NavigationProp;
-  route?: AddExpenseRouteProp;
+  route?: AddTransactionRouteProp;
 };
 
-const AddExpenseScreen: React.FC<AddExpenseScreenProps> = ({
+const AddTransactionScreen: React.FC<AddTransactionScreenProps> = ({
   navigation,
   route,
 }) => {
   useEffect(() => {
-    if (route?.params?.editExpense?._id) {
-      setExpense(route.params.editExpense);
+    if (route?.params?.editTransaction?._id) {
+      setTransaction(route.params.editTransaction);
       setIsEdit(true);
     } else {
       setIsEdit(false);
     }
-  }, [route?.params?.editExpense]);
+  }, [route?.params?.editTransaction]);
 
-  const { addExpense, updateExpense } = useContext(ExpenseContext);
+  const { addTransaction, updateTransaction } = useContext(TransactionContext);
 
-  const [expense, setExpense] = useState<IExpense>({
+  const [transaction, setTransaction] = useState<Transaction>({
     description: "",
     sum: null,
     category: "",
     date: new Date(),
+    transactionType: "expense",
   });
 
   const [isEdit, setIsEdit] = useState<boolean>(false);
@@ -50,7 +54,7 @@ const AddExpenseScreen: React.FC<AddExpenseScreenProps> = ({
   const onChange = (event: any, selectedDate?: Date) => {
     let currentDate = selectedDate
       ? new Date(selectedDate)
-      : new Date(expense.date!);
+      : new Date(transaction.date!);
 
     // Set time to start of the day in local timezone
     currentDate.setHours(0, 0, 0, 0);
@@ -63,26 +67,35 @@ const AddExpenseScreen: React.FC<AddExpenseScreenProps> = ({
     );
 
     setMode(null); // Hide the picker after selection
-    setExpense({ ...expense, date: currentDate });
+    setTransaction({ ...transaction, date: currentDate });
   };
 
-  const onSubmitExpense = (): void => {
-    if (!areAllFieldsFilled()) return;
+  const onSubmitTransaction = (): void => {
+    if (!areAllFieldsFilled()) {
+      Alert.alert("", "Please make sure to fill all the fields");
+      return;
+    }
 
-    console.log(isEdit);
-    isEdit ? updateExpense(expense) : addExpense(expense);
+    isEdit ? updateTransaction(transaction) : addTransaction(transaction);
     navigation.navigate("HomeScreen", {});
   };
 
   const areAllFieldsFilled = (): boolean => {
-    return !!(expense.sum && expense.category && expense.date);
+    return !!(
+      transaction.sum &&
+      transaction.category &&
+      transaction.date &&
+      transaction.transactionType &&
+      transaction.description
+    );
   };
 
-  const items = [
+  const categories = [
     { label: "None", value: "" },
     { label: "Housing", value: "Housing" },
     { label: "Utilities", value: "Utilities" },
     { label: "Food", value: "Food" },
+    { label: "Groceries", value: "Groceries" },
     { label: "Transportation", value: "Transportation" },
     { label: "Healthcare", value: "Healthcare" },
     { label: "Education", value: "Education" },
@@ -92,38 +105,64 @@ const AddExpenseScreen: React.FC<AddExpenseScreenProps> = ({
     { label: "Other", value: "Other" },
   ];
 
+  const transactionTypes = [
+    { label: "Expense", value: "expense" },
+    { label: "Income", value: "income" },
+    { label: "Saving", value: "saving" },
+  ];
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>New Expense</Text>
+      <Text style={styles.title}>New Transaction</Text>
       <Text>Description</Text>
       <TextInput
         style={styles.input}
-        placeholder="Describe the expense"
-        value={expense.description}
-        onChangeText={(value) => setExpense({ ...expense, description: value })}
+        placeholder="Describe the transaction"
+        value={transaction.description}
+        onChangeText={(value) =>
+          setTransaction({ ...transaction, description: value })
+        }
       ></TextInput>
-      <Text>Cost</Text>
+      <Text>Sum</Text>
       <TextInput
         style={styles.input}
         keyboardType="numeric"
-        placeholder="How much did you spend"
-        value={expense.sum ? "" + expense.sum : ""}
+        placeholder="Sum of the transaction"
+        value={transaction.sum ? "" + transaction.sum : ""}
         onChangeText={(value) =>
           value
-            ? setExpense({ ...expense, sum: +value })
-            : setExpense({ ...expense, sum: null })
+            ? setTransaction({ ...transaction, sum: +value })
+            : setTransaction({ ...transaction, sum: null })
         }
       ></TextInput>
-      <Text>Category</Text>
+      <Text>Transaction Type</Text>
       <View style={styles.input}>
         <Picker
-          selectedValue={expense.category || "none"}
+          selectedValue={transaction.transactionType || "none"}
           onValueChange={(itemValue) =>
-            setExpense({ ...expense, category: itemValue })
+            setTransaction({ ...transaction, transactionType: itemValue })
           }
           style={styles.picker}
         >
-          {items.map((item, i) => (
+          {transactionTypes.map((item, i) => (
+            <Picker.Item
+              key={"transactionType-" + i}
+              label={item.label}
+              value={item.value}
+            ></Picker.Item>
+          ))}
+        </Picker>
+      </View>
+      <Text>Category</Text>
+      <View style={styles.input}>
+        <Picker
+          selectedValue={transaction.category || "none"}
+          onValueChange={(itemValue) =>
+            setTransaction({ ...transaction, category: itemValue })
+          }
+          style={styles.picker}
+        >
+          {categories.map((item, i) => (
             <Picker.Item
               key={"category-" + i}
               label={item.label}
@@ -136,13 +175,13 @@ const AddExpenseScreen: React.FC<AddExpenseScreenProps> = ({
       <Button title="Pick a Date" onPress={() => setMode("date")}></Button>
       {mode && (
         <DateTimePicker
-          value={expense.date ?? new Date()}
+          value={transaction.date ?? new Date()}
           mode={mode}
           onChange={onChange}
         />
       )}
       <View style={{ marginBottom: 60 }}></View>
-      <Button title="+ Add" onPress={onSubmitExpense} />
+      <Button title="+ Add" onPress={onSubmitTransaction} />
     </View>
   );
 };
@@ -179,4 +218,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default AddExpenseScreen;
+export default AddTransactionScreen;

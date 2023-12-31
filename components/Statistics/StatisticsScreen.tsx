@@ -1,7 +1,7 @@
 import React, { useContext, useState, useEffect } from "react";
 
 import { VictoryPie, VictoryLabel } from "victory-native";
-import { ExpenseContext } from "../../context";
+
 import {
   ScrollView,
   View,
@@ -12,6 +12,7 @@ import {
   Button,
 } from "react-native";
 import { Alert } from "react-native";
+import TransactionContext from "../../context/Transaction/TransactionContext";
 
 const months = [
   "January",
@@ -44,7 +45,7 @@ const barColors = [
   "#C2185B",
 ];
 
-interface ExpenseData {
+interface TransactionData {
   category: string;
   totalSum: string;
 }
@@ -56,34 +57,34 @@ interface PieData {
 }
 
 const StatisticsScreen: React.FC = () => {
-  const { fetchGroupedExpenses } = useContext(ExpenseContext);
+  const { fetchGroupedTransactions } = useContext(TransactionContext);
   const [pieData, setPieData] = useState<PieData[]>([]);
   const [selectedMonth, setSelectedMonth] = useState<string>("");
   const [selectedYear, setSelectedYear] = useState<string>("");
   const [total, setTotal] = useState<number>();
 
   useEffect(() => {
-    getGroupedExpenses();
+    getGroupedTransactions();
   }, []);
 
-  const getGroupedExpenses = async () => {
+  const getGroupedTransactions = async () => {
     try {
       let year = parseInt(selectedYear);
       let month = months.indexOf(selectedMonth);
       const withYearAndMonth = year && month !== -1;
 
-      const groupedExpenses = withYearAndMonth
-        ? await fetchGroupedExpenses(year, month)
-        : await fetchGroupedExpenses();
+      const groupedTransactions = withYearAndMonth
+        ? await fetchGroupedTransactions(year, month)
+        : await fetchGroupedTransactions();
 
-      const formattedData = formatData(groupedExpenses);
+      const formattedData = formatData(groupedTransactions);
       setPieData(formattedData);
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   };
 
-  const formatData = (data: ExpenseData[]): PieData[] => {
+  const formatData = (data: TransactionData[]): PieData[] => {
     const totalOverall = data.reduce((total, item) => {
       return total + +item.totalSum;
     }, 0);
@@ -129,7 +130,7 @@ const StatisticsScreen: React.FC = () => {
       Alert.alert("Invalid Month", "Please select a year and a month");
       return;
     }
-    getGroupedExpenses();
+    getGroupedTransactions();
   };
 
   return (
@@ -171,7 +172,7 @@ const StatisticsScreen: React.FC = () => {
           />
         </>
       ) : (
-        <Text>No Expenses in selected month</Text>
+        <Text>No Transactions in selected month</Text>
       )}
     </ScrollView>
   );

@@ -28,7 +28,6 @@ const AppContent: React.FC = () => {
         throw new Error("error retrieving user, login again");
 
       const url = new URL(`${process.env.API_URL ?? serverURL}/auth/user`);
-
       const res: Response = await fetch(url, {
         method: "GET",
         headers: {
@@ -48,7 +47,7 @@ const AppContent: React.FC = () => {
       setUserId(user._id);
       setIsLoggedIn(true);
     } catch (error: any) {
-      console.log(error.message);
+      console.error(error.message);
     }
   };
 

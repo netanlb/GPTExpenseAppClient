@@ -4,14 +4,14 @@ import { NavigationContainer } from "@react-navigation/native";
 import ProfileNavigator from "../components/Profile/ProfileNavigator";
 import HomeNavigator from "../components/Home/HomeNavigator";
 import AssistantNavigation from "../components/Assistant/AssistantNavigator";
-import { ExpenseProvider } from "../context";
+import { TransactionProvider } from "../context";
 import StatisticsNavigator from "../components/Statistics/StatisticsNavigator";
 
 const Tab = createBottomTabNavigator();
 
 const Tabs = () => {
   return (
-    <ExpenseProvider>
+    <TransactionProvider>
       <Tab.Navigator>
         <Tab.Screen
           name="Home"
@@ -55,7 +55,7 @@ const Tabs = () => {
           }}
         ></Tab.Screen>
       </Tab.Navigator>
-    </ExpenseProvider>
+    </TransactionProvider>
   );
 };
 

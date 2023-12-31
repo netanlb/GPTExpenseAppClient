@@ -1,8 +1,8 @@
 import { Text, StyleSheet, View } from "react-native";
 import { useState, useContext } from "react";
 import { GiftedChat } from "react-native-gifted-chat";
-import { ExpenseContext } from "../../context";
 import { DEV_SERVER_URL, PROD_SERVER_URL } from "@env";
+import TransactionContext from "../../context/Transaction/TransactionContext";
 
 let serverURL: string;
 if (__DEV__) {
@@ -12,7 +12,7 @@ if (__DEV__) {
 }
 
 const AssistantScreen = () => {
-  const { expenseList } = useContext(ExpenseContext);
+  const { transactionList } = useContext(TransactionContext);
   const [messages, setMessages] = useState([]);
 
   const parseDate = (date: Date | string): string => {
@@ -30,17 +30,17 @@ const AssistantScreen = () => {
         GiftedChat.append(previousMessages, userMessage)
       );
 
-      // Create prompt for GPT based on the user's message and expenses
+      // Create prompt for GPT based on the user's message and transactions
       let systemMessage;
 
-      if (expenseList.length) {
-        systemMessage = `You are a motivational advisor who inspires positive financial decisions and habits. This month's expenses include: ${expenseList
+      if (transactionList.length) {
+        systemMessage = `You are a motivational advisor who inspires positive financial decisions and habits. This month's transactions include: ${transactionList
           .map(
-            (expense) =>
-              `On ${parseDate(expense.date!)}, ${
-                expense.sum
-              } shekels were spent on ${expense.category} for ${
-                expense.description
+            (transaction) =>
+              `On ${parseDate(transaction.date!)}, ${
+                transaction.sum
+              } shekels were spent on ${transaction.category} for ${
+                transaction.description
               }.`
           )
           .join(" ")}`;
@@ -51,7 +51,7 @@ const AssistantScreen = () => {
 
       const userMessageContent = userMessage.text;
 
-      if (!expenseList.length) return;
+      if (!transactionList.length) return;
       const response = await fetch(
         `${process.env.API_URL ?? serverURL}/openai`,
         {
@@ -104,7 +104,7 @@ const AssistantScreen = () => {
         );
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   };
 
